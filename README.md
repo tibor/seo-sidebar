@@ -1,4 +1,4 @@
-# Persistent Sidebar Chrome Extension
+# Persistent SEO Sidebar (Chrome Extension)
 
 ## Overview
 
@@ -25,3 +25,7 @@ The SEO Sidebar Chrome Extension adds a sidebar to the browser that remains open
 1. Once the extension is loaded, click the extension icon to toggle the sidebar.
 2. The sidebar will appear on the left side of the browser window.
 3. Use the provided tools and links within the sidebar.
+
+
+## Contact
+You can reach me at aviationcoder@gmail.com.
