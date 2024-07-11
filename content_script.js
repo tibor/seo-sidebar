@@ -11,7 +11,7 @@ function createSidebar() {
         sidebar.style.backgroundColor = '#f1f1f1';
         sidebar.style.borderRight = '1px solid #ccc';
         sidebar.style.zIndex = '2147483647';
-        
+
         sidebar.innerHTML = '<iframe src="' + chrome.runtime.getURL('sidebar.html') + '" style="width: 100%; height: 100%; border: none;"></iframe>';
         document.body.appendChild(sidebar);
 
@@ -27,6 +27,14 @@ function removeSidebar() {
         sidebar.remove();
         document.body.style.marginLeft = '0'; // Reset body margin
     }
+}
+
+function getWordCount(text) {
+    return text.trim().split(/\s+/).length;
+}
+
+function getCharacterCount(text) {
+    return text.length;
 }
 
 // Check user settings on load
@@ -53,6 +61,29 @@ chrome.storage.onChanged.addListener(function (changes, area) {
     }
 });
 
+function collectLinks() {
+    const internalLinks = [];
+    const externalLinks = [];
+    const currentHostname = window.location.hostname;
+
+    document.querySelectorAll('a[href]').forEach(link => {
+        const linkHostname = new URL(link.href).hostname;
+
+        if (linkHostname === currentHostname) {
+            internalLinks.push(link.href);
+        } else {
+            externalLinks.push(link.href);
+        }
+    });
+
+    return {
+        internalLinks: [...new Set(internalLinks)], // Remove duplicates
+        externalLinks: [...new Set(externalLinks)] // Remove duplicates
+    };
+}
+
+
+
 function collectPageData() {
     const canonicalElement = document.querySelector('link[rel="canonical"]');
     const canonicalUrl = canonicalElement ? canonicalElement.getAttribute('href') : '';
@@ -61,9 +92,16 @@ function collectPageData() {
     const firstH1 = document.querySelector('h1');
     const firstH1Text = firstH1 ? firstH1.textContent : 'No H1 found';
 
+    const title = document.title;
+    const metaDescription = document.querySelector('meta[name="description"]')?.getAttribute('content') || '';
+
     const pageData = {
-        title: document.title,
-        metaDescription: document.querySelector('meta[name="description"]')?.getAttribute('content') || '',
+        title: title,
+        titleWordCount: getWordCount(title),
+        titleCharacterCount: getCharacterCount(title),
+        metaDescription: metaDescription,
+        metaDescriptionWordCount: getWordCount(metaDescription),
+        metaDescriptionCharacterCount: getCharacterCount(metaDescription),
         metaRobots: document.querySelector('meta[name="robots"]')?.getAttribute('content') || '',
         canonicalUrl: canonicalUrl,
         firstH1: firstH1Text,
@@ -72,7 +110,8 @@ function collectPageData() {
         currentUrl: currentUrl,
         isCanonicalSameAsUrl: canonicalUrl ? (canonicalUrl === currentUrl ? 'Canonical is identical with page URL' : 'Canonical is <b>not</b> the same as the page URL') : 'No canonical defined',
         schemaTypes: [], // Ensure schemaTypes is initialized as an array
-        headings: collectHeadings()
+        headings: collectHeadings(),
+        links: collectLinks()
     };
 
     // Measure page load time
@@ -96,6 +135,7 @@ function collectPageData() {
         }
     });
 
+    console.log('Page Data:', pageData); // Debug log
     return pageData;
 }
 
@@ -153,6 +193,12 @@ function extractSchemaTypes(json) {
     }
     return null;
 }
+
+// Ensure script runs after document is fully loaded
+window.onload = function() {
+    console.log("Window loaded");
+    collectPageData();
+};
 
 // Send the collected page data to the background script
 chrome.runtime.sendMessage({ action: 'collectPageData', data: collectPageData() });

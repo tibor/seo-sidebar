@@ -16,7 +16,8 @@
     "web_accessible_resources": [
         {
             "resources": [
-                "sidebar.html"
+                "sidebar.html",
+                 "google_sidebar.html"
             ],
             "matches": [
                 "*://*/*"

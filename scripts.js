@@ -9,7 +9,11 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('page_load_time').value = `${pageData.pageLoadTime.toFixed(2)} ms`;
         document.getElementById('html_node_count').value = pageData.htmlNodeCount;
         document.getElementById('h1').value = pageData.firstH1;
-        console.log(pageData);
+        
+
+        // Update word and character counts
+        document.getElementById('page_title_counts').innerHTML = `Words: ${pageData.titleWordCount}, Characters: ${pageData.titleCharacterCount}`;
+        document.getElementById('meta_description_counts').innerHTML = `Words: ${pageData.metaDescriptionWordCount}, Characters: ${pageData.metaDescriptionCharacterCount}`;
 
         const schemaTypesList = document.getElementById('schema-types-list');
         schemaTypesList.innerHTML = ''; // Clear previous entries
@@ -26,6 +30,12 @@ document.addEventListener('DOMContentLoaded', function () {
             listItem.appendChild(createHeadingElement(heading));
             headingsList.appendChild(listItem);
         });
+
+
+        // Display internal and external links
+        document.getElementById('internal_links').value = pageData.links.internalLinks.join('\n');
+        document.getElementById('external_links').value = pageData.links.externalLinks.join('\n');
+
     }
 
     // Recursive function to create nested list elements for schema types
@@ -77,7 +87,7 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
     // Get the collected page data from storage and fill the form
-    chrome.storage.local.get(['pageData', 'responseHeaders'], function (result) {
+    chrome.storage.local.get(['pageData', 'responseHeaders', 'hreflangLinks'], function (result) {
         if (result.pageData) {
             fillPageData(result.pageData);
         }
@@ -85,6 +95,14 @@ document.addEventListener('DOMContentLoaded', function () {
             const responseHeadersText = result.responseHeaders.map(header => `${header.name}: ${header.value}`).join('\n');
             document.getElementById('response_headers').value = responseHeadersText;
         }
+        /* For later :) 
+        if (result.hreflangLinks) {
+            const hreflangLinksText = result.hreflangLinks.map(link => `${link.hreflang}: ${link.href}`).join('\n');
+            document.getElementById('hreflang_links').value = hreflangLinksText;
+        } else {
+            document.getElementById('hreflang_links').value = 'No hreflang links found.';
+        }
+         */
     });
 
     // Get the link element by its ID

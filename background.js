@@ -103,9 +103,26 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
 // Intercept response headers for the main document only
 chrome.webRequest.onCompleted.addListener(
-    function(details) {
+    function (details) {
         if (details.type === 'main_frame') {
             chrome.storage.local.set({ responseHeaders: details.responseHeaders });
+
+            const hreflangLinks = details.responseHeaders.filter(header => header.name.toLowerCase() === 'link' && /rel="alternate" hreflang=/.test(header.value))
+                .map(header => {
+                    const match = header.value.match(/hreflang="([^"]+)"\s*;\s*href="([^"]+)"/);
+                    return match ? { hreflang: match[1], href: match[2] } : null;
+                })
+                .filter(link => link !== null);
+
+            /*
+                // 11.07.2024  CH  Hreflang lik collection. we will add this later. 
+                if (hreflangLinks.length > 0) {
+                chrome.storage.local.set({ hreflangLinks: hreflangLinks });
+            }
+                */
+
+
+
         }
     },
     { urls: ["<all_urls>"] },
