@@ -1,0 +1,53 @@
+{
+    "manifest_version": 3,
+    "name": "Persistent SEO Sidebar",
+    "version": "1.0",
+    "description": "A Chrome extension with a persistent sidebar to display SEO information.",
+    "permissions": [
+        "tabs",
+        "activeTab",
+        "storage",
+        "scripting",
+        "webRequest"
+    ],
+    "host_permissions": [
+        "*://*/*"
+    ],
+    "web_accessible_resources": [
+        {
+            "resources": [
+                "sidebar.html"
+            ],
+            "matches": [
+                "*://*/*"
+            ]
+        }
+    ],
+    "background": {
+        "service_worker": "background.js"
+    },
+    "action": {
+        "default_icon": {
+            "16": "icons/sidebar-icon-16.png",
+            "48": "icons/sidebar-icon-48.png",
+            "128": "icons/sidebar-icon-128.png"
+        }
+    },
+    "content_scripts": [
+        {
+            "matches": [
+                "http://*/*",
+                "https://*/*"
+            ],
+            "js": [
+                "content_script.js"
+            ],
+            "run_at": "document_end"
+        }
+    ],
+    "icons": {
+        "16": "icons/sidebar-icon-16.png",
+        "48": "icons/sidebar-icon-48.png",
+        "128": "icons/sidebar-icon-128.png"
+    }
+}

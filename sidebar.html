@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <title>SEO Sidebar</title>
+    <link rel="stylesheet" type="text/css" href="sidebar.css">
+    <meta http-equiv="Content-Security-Policy" content="script-src 'self'; object-src 'self'">
+
+</head>
+
+<body>
+    <div id="sidebar-content">
+        <h1>SEO Sidebar</h1>
+        <p>
+            <a href="https://haensel.pro" target="_blank" title="The creator of this shiny object">&raquo; haensel.pro</a><br>
+            <small>You can toggle this by clicking the extension icon in your browser.</small>
+        </p>
+
+        <div class="section">
+            <h2>Tools</h2>
+            <ul>
+                <li>
+                    <a id="openValidatorLink" href="#">Schema Markup Validator</a>
+                </li>
+                <li>
+                    <a id="validateInGoogleRichResult" href="#">Rich Result Testing Tool</a>
+                </li>
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Page Data</h2>
+            <form id="page-data-form">
+                <label for="page_title">Page Title:</label>
+                <textarea id="page_title" name="page_title"></textarea><br><br>
+
+                <label for="meta_description">Meta Description:</label>
+                <textarea id="meta_description" name="meta_description"></textarea><br><br>
+
+                <label for="meta_robots">Meta Robots:</label>
+                <textarea id="meta_robots" name="meta_robots"></textarea><br><br>
+
+                <label for="canonical_url">Canonical URL:</label>
+                <input type="text" id="canonical_url" name="canonical_url">
+                <div id="canonical_is_same_as_url"></div>
+                <br><br>
+
+                <label for="page_load_time">Page Load Time (ms):</label>
+                <input type="text" id="page_load_time" name="page_load_time"><br><br>
+
+                <label for="html_node_count">HTML Node Count:</label>
+                <input type="text" id="html_node_count" name="html_node_count"><br><br>
+
+                <label for="h1">First &lt;h1&gt;</label>
+                <textarea id="h1" name="h1"></textarea><br><br>
+            </form>
+        </div>
+
+        <div class="section">
+            <h2>Schema.org Types</h2>
+            <ul id="schema-types-list">
+                <!-- Schema types will be inserted here -->
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Headings</h2>
+            <ul id="headings-list">
+                <!-- Schema types will be inserted here -->
+            </ul>
+        </div>
+
+        <div class="section">
+            <h2>Response Headers</h2>
+            <label for="response_headers">Response Headers:</label>
+            <textarea id="response_headers" name="response_headers" class="large"></textarea><br><br>
+        </div>
+
+
+    </div>
+
+    <script src="scripts.js" defer></script>
+</body>
+
+</html>
