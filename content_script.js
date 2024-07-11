@@ -89,6 +89,14 @@ function collectPageData() {
     const canonicalUrl = canonicalElement ? canonicalElement.getAttribute('href') : '';
     const currentUrl = window.location.href;
 
+    // Create URL objects to easily strip off query parameters
+    const currentUrlObj = new URL(currentUrl);
+    const canonicalUrlObj = new URL(canonicalUrl);
+
+    const currentUrlNoParams = currentUrlObj.origin + currentUrlObj.pathname;
+    const canonicalUrlNoParams = canonicalUrlObj.origin + canonicalUrlObj.pathname;
+    console.log("Currennt without params " + currentUrlNoParams)
+
     const firstH1 = document.querySelector('h1');
     const firstH1Text = firstH1 ? firstH1.textContent : 'No H1 found';
 
@@ -108,7 +116,9 @@ function collectPageData() {
         htmlNodeCount: document.getElementsByTagName('*').length,
         pageSize: new Blob([document.documentElement.outerHTML]).size,
         currentUrl: currentUrl,
-        isCanonicalSameAsUrl: canonicalUrl ? (canonicalUrl === currentUrl ? 'Canonical is identical with page URL' : 'Canonical is <b>not</b> the same as the page URL') : 'No canonical defined',
+        isCanonicalSameAsUrl: canonicalUrl ?
+            (canonicalUrlNoParams === currentUrlNoParams ? '✔️ Canonical is identical with page URL' : '❌ Canonical is <b>not</b> the same as the page URL') :
+            'No canonical defined',
         schemaTypes: [], // Ensure schemaTypes is initialized as an array
         headings: collectHeadings(),
         links: collectLinks()
@@ -135,7 +145,6 @@ function collectPageData() {
         }
     });
 
-    console.log('Page Data:', pageData); // Debug log
     return pageData;
 }
 
@@ -195,8 +204,7 @@ function extractSchemaTypes(json) {
 }
 
 // Ensure script runs after document is fully loaded
-window.onload = function() {
-    console.log("Window loaded");
+window.onload = function () {
     collectPageData();
 };
 

@@ -87,7 +87,7 @@ a:hover {
     list-style-type: none;
 }
 
-#sidebar-content ul li a {
+#sidebar-content ul li a, button {
     display: block;
     padding: 10px 15px;
     background-color: #007bff;
@@ -99,9 +99,10 @@ a:hover {
     font-weight: bold;
     margin-bottom: 10px;
     transition: background-color 0.3s, border-color 0.3s;
+    cursor: pointer;
 }
 
-#sidebar-content ul li a:hover {
+#sidebar-content ul li a:hover, button:hover {
     background-color: #0056b3;
     border-color: #0056b3;
 }

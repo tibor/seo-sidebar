@@ -39,7 +39,14 @@ The lower part
 You can reach me at aviationcoder@gmail.com.
 
 ## Planned features
-- Word count of title, meta description etc.
-- Character count of title, meta description etc.
-- Collection of internal and external links on the page
-- Export of data to JSON and CSV
+- collect hreflang links
+
+
+
+## Completed Features
+- ✔️ Word count of title, meta description etc.
+- ✔️ Character count of title, meta description etc.
+- ✔️ Collection of internal and external links on the page.
+- ✔️ Export of data to JSON ~~and CSV~~.
+- ✔️ Display robots.txt content.
+

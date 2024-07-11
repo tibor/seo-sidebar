@@ -9,7 +9,7 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('page_load_time').value = `${pageData.pageLoadTime.toFixed(2)} ms`;
         document.getElementById('html_node_count').value = pageData.htmlNodeCount;
         document.getElementById('h1').value = pageData.firstH1;
-        
+
 
         // Update word and character counts
         document.getElementById('page_title_counts').innerHTML = `Words: ${pageData.titleWordCount}, Characters: ${pageData.titleCharacterCount}`;
@@ -31,10 +31,15 @@ document.addEventListener('DOMContentLoaded', function () {
             headingsList.appendChild(listItem);
         });
 
+        // Fetch and display robots.txt
+        fetchRobotsTxt(pageData.currentUrl);
 
         // Display internal and external links
         document.getElementById('internal_links').value = pageData.links.internalLinks.join('\n');
         document.getElementById('external_links').value = pageData.links.externalLinks.join('\n');
+
+        // Update robots.txt content
+        document.getElementById('robots_txt').value = pageData.robotsTxtContent;
 
     }
 
@@ -90,6 +95,12 @@ document.addEventListener('DOMContentLoaded', function () {
     chrome.storage.local.get(['pageData', 'responseHeaders', 'hreflangLinks'], function (result) {
         if (result.pageData) {
             fillPageData(result.pageData);
+
+            // Add event listeners to the download buttons
+            document.getElementById('download-json').addEventListener('click', function () {
+                downloadJSON(result.pageData);
+            });
+
         }
         if (result.responseHeaders) {
             const responseHeadersText = result.responseHeaders.map(header => `${header.name}: ${header.value}`).join('\n');
@@ -104,6 +115,31 @@ document.addEventListener('DOMContentLoaded', function () {
         }
          */
     });
+
+    // Fetch robots.txt
+    function fetchRobotsTxt(url) {
+        try {
+            const urlObj = new URL(url);
+            const robotsUrl = `${urlObj.origin}/robots.txt`;
+
+            fetch(robotsUrl)
+                .then(response => {
+                    if (response.ok) {
+                        return response.text();
+                    }
+                    throw new Error('Network response was not ok.');
+                })
+                .then(text => {
+                    document.getElementById('robots_txt').value = text;
+                })
+                .catch(error => {
+                    document.getElementById('robots_txt').value = 'Failed to load robots.txt';
+                });
+        } catch (e) {
+            document.getElementById('robots_txt').value = 'Invalid URL';
+        }
+    }
+
 
     // Get the link element by its ID
     var validator_link = document.getElementById('openValidatorLink');
@@ -141,6 +177,27 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
 
+    // Download data as JSON file
+    function downloadJSON(data) {
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(data));
+        const downloadAnchorNode = document.createElement('a');
+        downloadAnchorNode.setAttribute("href", dataStr);
+        downloadAnchorNode.setAttribute("download", "page_data.json");
+        document.body.appendChild(downloadAnchorNode); // required for firefox
+        downloadAnchorNode.click();
+        downloadAnchorNode.remove();
+    }
+
+    // Fetch robots.txt and update page data
+    fetchRobotsTxt().then(robotsTxtContent => {
+        chrome.storage.local.get('pageData', function (result) {
+            const pageData = result.pageData || {};
+            pageData.robotsTxtContent = robotsTxtContent;
+            chrome.storage.local.set({ pageData: pageData }, function () {
+                fillPageData(pageData);
+            });
+        });
+    });
 
 
 
