@@ -26,6 +26,20 @@ The SEO Sidebar Chrome Extension adds a sidebar to the browser that remains open
 2. The sidebar will appear on the left side of the browser window.
 3. Use the provided tools and links within the sidebar.
 
+## Screenshots
+
+The top part
+![First view of the thing](screenshots/first_version.png)
+
+The lower part
+![First view of the thing - the lower part](screenshots/first_version_2.png)
+
 
 ## Contact
 You can reach me at aviationcoder@gmail.com.
+
+## Planned features
+- Word count of title, meta description etc.
+- Character count of title, meta description etc.
+- Collection of internal and external links on the page
+- Export of data to JSON and CSV
