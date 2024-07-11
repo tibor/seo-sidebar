@@ -27,16 +27,17 @@ The SEO Sidebar Chrome Extension adds a sidebar to the browser that remains open
 3. Use the provided tools and links within the sidebar.
 
 ## Screenshots
+Here are some screenshots so you cen see what it looks like. They might be a bit out of date - I tend to forget stuff like this.
 
-The top part
-![First view of the thing](screenshots/first_version.png)
+![First view of the thing](screenshots/version_2_1.png)
+![First view of the thing](screenshots/version_2_2.png)
+![First view of the thing](screenshots/version_2_3.png)
 
-The lower part
-![First view of the thing - the lower part](screenshots/first_version_2.png)
-
+By the way: I hope Stephan Czysch is okay with me using his website for my screenshots. I love his list of [SEO Browser Plugins and Bookmarklets](https://www.stephan-czysch.de/online-marketing-tipps/perfekter-seo-browser-plugins-bookmarklets). Go and check them out ❤️.
 
 ## Contact
-You can reach me at aviationcoder@gmail.com.
+You can reach me at aviationcoder@googlemail.com. 
+(also my PayPal \*cough\*)
 
 ## Planned features
 - collect hreflang links
