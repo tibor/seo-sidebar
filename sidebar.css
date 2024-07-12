@@ -51,7 +51,6 @@ p {
 .section h2 {
     font-size: 18px;
     color: #333;
-    border-bottom: 2px solid #000;
     padding-bottom: 5px;
     margin-bottom: 15px;
     margin-top: 0;
@@ -159,7 +158,7 @@ textarea.large {
 .section h2 {
     font-size: 20px;
     color: #333;
-    border-bottom: 1px solid #ccc;
+    border-bottom: 1px dashed #ccc;
     padding-bottom: 5px;
     margin-bottom: 15px;
     margin-top: 0;

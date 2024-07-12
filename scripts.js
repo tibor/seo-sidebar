@@ -1,6 +1,8 @@
 document.addEventListener('DOMContentLoaded', function () {
     // Function to fill the form fields with the collected page data
     function fillPageData(pageData) {
+        console.log('fillPageData pageData:', pageData);
+
         document.getElementById('page_title').value = pageData.title;
         document.getElementById('meta_description').value = pageData.metaDescription;
         document.getElementById('meta_robots').value = pageData.metaRobots;
@@ -31,15 +33,16 @@ document.addEventListener('DOMContentLoaded', function () {
             headingsList.appendChild(listItem);
         });
 
-        // Fetch and display robots.txt
-        fetchRobotsTxt(pageData.currentUrl);
-
         // Display internal and external links
         document.getElementById('internal_links').value = pageData.links.internalLinks.join('\n');
         document.getElementById('external_links').value = pageData.links.externalLinks.join('\n');
 
         // Update robots.txt content
-        document.getElementById('robots_txt').value = pageData.robotsTxtContent;
+        console.log('fillPageData robotsTxtContent:', pageData.robotsTxtContent);
+        document.getElementById('robots_txt').value = typeof pageData.robotsTxtContent === 'string' ? pageData.robotsTxtContent : '';
+
+        // Update sitemaps content
+        document.getElementById('sitemaps').value = pageData.sitemaps ? pageData.sitemaps.join('\n') : '';
     }
 
     // Recursive function to create nested list elements for schema types
@@ -86,14 +89,79 @@ document.addEventListener('DOMContentLoaded', function () {
         return div;
     }
 
+    // Fetch robots.txt
+    function fetchRobotsTxt(url) {
+        return new Promise((resolve, reject) => {
+            try {
+                const urlObj = new URL(url);
+                const robotsUrl = `${urlObj.origin}/robots.txt`;
+
+                fetch(robotsUrl)
+                    .then(response => {
+                        if (response.ok) {
+                            return response.text();
+                        }
+                        throw new Error('Network response was not ok.');
+                    })
+                    .then(text => {
+                        console.log('Fetched robots.txt content:', text);
+                        document.getElementById('robots_txt').value = text;
+
+                        // Extract and display Sitemap references
+                        const sitemaps = extractSitemaps(text);
+
+                        chrome.storage.local.get('pageData', function (result) {
+                            const pageData = result.pageData || {};
+                            pageData.sitemaps = sitemaps;
+                            pageData.robotsTxtContent = text; // Update robots.txt content in pageData
+                            chrome.storage.local.set({ pageData: pageData }, function () {
+                                // Update the form with the new data
+                                fillPageData(pageData);
+                                resolve(pageData);
+                            });
+                        });
+
+                        document.getElementById('sitemaps').value = sitemaps.join('\n');
+                    })
+                    .catch(error => {
+                        document.getElementById('robots_txt').value = 'Failed to load robots.txt';
+                        document.getElementById('sitemaps').value = 'No Sitemaps found';
+                        reject(error);
+                    });
+            } catch (e) {
+                document.getElementById('robots_txt').value = 'Invalid URL';
+                document.getElementById('sitemaps').value = 'No Sitemaps found';
+                reject(e);
+            }
+        });
+    }
+
+    // Function to extract Sitemap references from robots.txt content
+    function extractSitemaps(robotsTxtContent) {
+        const sitemapRegex = /^Sitemap:\s*(.+)$/gm;
+        const sitemaps = [];
+        let match;
+        while ((match = sitemapRegex.exec(robotsTxtContent)) !== null) {
+            sitemaps.push(match[1].trim());
+        }
+        return sitemaps;
+    }
+
     // Get the collected page data from storage and fill the form
     chrome.storage.local.get(['pageData', 'responseHeaders', 'hreflangLinks'], function (result) {
         if (result.pageData) {
+            console.log('Retrieved pageData:', result.pageData);
             fillPageData(result.pageData);
 
-            // Add event listeners to the download buttons
-            document.getElementById('download-json').addEventListener('click', function () {
-                downloadJSON(result.pageData);
+            // Fetch robots.txt content after filling the initial page data
+            fetchRobotsTxt(result.pageData.currentUrl).then(() => {
+                // Add event listeners to the download buttons
+                document.getElementById('download-json').addEventListener('click', function () {
+                    chrome.storage.local.get('pageData', function (result) {
+                        console.log('Downloading JSON:', result.pageData);
+                        downloadJSON(result.pageData);
+                    });
+                });
             });
         }
         if (result.responseHeaders) {
@@ -101,30 +169,6 @@ document.addEventListener('DOMContentLoaded', function () {
             document.getElementById('response_headers').value = responseHeadersText;
         }
     });
-
-    // Fetch robots.txt
-    function fetchRobotsTxt(url) {
-        try {
-            const urlObj = new URL(url);
-            const robotsUrl = `${urlObj.origin}/robots.txt`;
-
-            fetch(robotsUrl)
-                .then(response => {
-                    if (response.ok) {
-                        return response.text();
-                    }
-                    throw new Error('Network response was not ok.');
-                })
-                .then(text => {
-                    document.getElementById('robots_txt').value = text;
-                })
-                .catch(error => {
-                    document.getElementById('robots_txt').value = 'Failed to load robots.txt';
-                });
-        } catch (e) {
-            document.getElementById('robots_txt').value = 'Invalid URL';
-        }
-    }
 
     // Get the link element by its ID
     var validator_link = document.getElementById('openValidatorLink');
@@ -193,15 +237,4 @@ document.addEventListener('DOMContentLoaded', function () {
         downloadAnchorNode.click();
         downloadAnchorNode.remove();
     }
-
-    // Fetch robots.txt and update page data
-    fetchRobotsTxt().then(robotsTxtContent => {
-        chrome.storage.local.get('pageData', function (result) {
-            const pageData = result.pageData || {};
-            pageData.robotsTxtContent = robotsTxtContent;
-            chrome.storage.local.set({ pageData: pageData }, function () {
-                fillPageData(pageData);
-            });
-        });
-    });
 });
