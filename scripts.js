@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('page_load_time').value = `${pageData.pageLoadTime.toFixed(2)} ms`;
         document.getElementById('html_node_count').value = pageData.htmlNodeCount;
         document.getElementById('h1').value = pageData.firstH1;
+        document.getElementById('http_status_code').value = pageData.httpStatusCode;
 
 
         // Update word and character counts
@@ -106,14 +107,6 @@ document.addEventListener('DOMContentLoaded', function () {
             const responseHeadersText = result.responseHeaders.map(header => `${header.name}: ${header.value}`).join('\n');
             document.getElementById('response_headers').value = responseHeadersText;
         }
-        /* For later :) 
-        if (result.hreflangLinks) {
-            const hreflangLinksText = result.hreflangLinks.map(link => `${link.hreflang}: ${link.href}`).join('\n');
-            document.getElementById('hreflang_links').value = hreflangLinksText;
-        } else {
-            document.getElementById('hreflang_links').value = 'No hreflang links found.';
-        }
-         */
     });
 
     // Fetch robots.txt

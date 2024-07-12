@@ -95,7 +95,6 @@ function collectPageData() {
 
     const currentUrlNoParams = currentUrlObj.origin + currentUrlObj.pathname;
     const canonicalUrlNoParams = canonicalUrlObj.origin + canonicalUrlObj.pathname;
-    console.log("Currennt without params " + currentUrlNoParams)
 
     const firstH1 = document.querySelector('h1');
     const firstH1Text = firstH1 ? firstH1.textContent : 'No H1 found';
@@ -143,6 +142,14 @@ function collectPageData() {
         } catch (e) {
             console.error('Error parsing JSON-LD:', e);
         }
+    });
+
+    // Get the HTTP status code from storage
+    chrome.storage.local.get('httpStatusCode', function (result) {
+        pageData.httpStatusCode = result.httpStatusCode || 'N/A';
+
+        // Send the collected page data to the background script
+        chrome.runtime.sendMessage({ action: 'collectPageData', data: pageData });
     });
 
     return pageData;
