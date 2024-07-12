@@ -11,7 +11,6 @@ document.addEventListener('DOMContentLoaded', function () {
         document.getElementById('h1').value = pageData.firstH1;
         document.getElementById('http_status_code').value = pageData.httpStatusCode;
 
-
         // Update word and character counts
         document.getElementById('page_title_counts').innerHTML = `Words: ${pageData.titleWordCount}, Characters: ${pageData.titleCharacterCount}`;
         document.getElementById('meta_description_counts').innerHTML = `Words: ${pageData.metaDescriptionWordCount}, Characters: ${pageData.metaDescriptionCharacterCount}`;
@@ -41,7 +40,6 @@ document.addEventListener('DOMContentLoaded', function () {
 
         // Update robots.txt content
         document.getElementById('robots_txt').value = pageData.robotsTxtContent;
-
     }
 
     // Recursive function to create nested list elements for schema types
@@ -88,10 +86,6 @@ document.addEventListener('DOMContentLoaded', function () {
         return div;
     }
 
-
-
-
-
     // Get the collected page data from storage and fill the form
     chrome.storage.local.get(['pageData', 'responseHeaders', 'hreflangLinks'], function (result) {
         if (result.pageData) {
@@ -101,7 +95,6 @@ document.addEventListener('DOMContentLoaded', function () {
             document.getElementById('download-json').addEventListener('click', function () {
                 downloadJSON(result.pageData);
             });
-
         }
         if (result.responseHeaders) {
             const responseHeadersText = result.responseHeaders.map(header => `${header.name}: ${header.value}`).join('\n');
@@ -133,11 +126,10 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     }
 
-
     // Get the link element by its ID
     var validator_link = document.getElementById('openValidatorLink');
     var rich_result_link = document.getElementById('validateInGoogleRichResult');
-
+    var settings_link = document.getElementById('openSettingsLink');
 
     // Add a click event listener to the link
     validator_link.addEventListener('click', function (event) {
@@ -169,6 +161,27 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
+    // Add a click event listener to the settings link
+    settings_link.addEventListener('click', function (event) {
+        event.preventDefault();
+        chrome.runtime.openOptionsPage().catch(err => console.error(err));
+    });
+
+    // Listen for changes in the storage to update sidebar appearance
+    chrome.storage.onChanged.addListener(function (changes, area) {
+        if (area === 'local') {
+            if (changes.sidebarWidth || changes.sidebarBgColor) {
+                chrome.storage.local.get(['sidebarWidth', 'sidebarBgColor'], function (result) {
+                    const sidebar = document.getElementById('persistent-sidebar');
+                    if (sidebar) {
+                        sidebar.style.width = (result.sidebarWidth || 500) + 'px';
+                        sidebar.style.backgroundColor = result.sidebarBgColor || '#f1f1f1';
+                        document.body.style.marginLeft = (result.sidebarWidth || 500) + 'px';
+                    }
+                });
+            }
+        }
+    });
 
     // Download data as JSON file
     function downloadJSON(data) {
@@ -191,8 +204,4 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         });
     });
-
-
-
-
 });

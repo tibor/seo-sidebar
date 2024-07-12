@@ -1,9 +1,24 @@
+#persistent-sidebar {
+    position: fixed;
+    top: 0;
+    left: 0;
+    height: 100vh;
+    border-right: 1px solid #ccc;
+    z-index: 9999999; /* Max z-index value */
+    overflow-y: scroll;
+    transform: translateZ(0); /* Create a new stacking context */
+    transition: width 0.3s ease, background-color 0.3s ease;
+}
+
+
+
 body {
     font-family: Arial, sans-serif;
     line-height: 1.6;
     margin: 0;
     padding: 0;
     background-color: #f9f9f9;
+    transition: margin-left 0.3s ease;
 }
 
 #sidebar-content {

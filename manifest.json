@@ -17,7 +17,7 @@
         {
             "resources": [
                 "sidebar.html",
-                 "google_sidebar.html"
+                "settings.html"
             ],
             "matches": [
                 "*://*/*"
@@ -41,7 +41,8 @@
                 "https://*/*"
             ],
             "js": [
-                "content_script.js"
+                "content_script.js",
+                "sidebar_injector.js"
             ],
             "run_at": "document_end"
         }
@@ -50,5 +51,7 @@
         "16": "icons/sidebar-icon-16.png",
         "48": "icons/sidebar-icon-48.png",
         "128": "icons/sidebar-icon-128.png"
-    }
+    },
+    "options_page": "settings.html"
+
 }
