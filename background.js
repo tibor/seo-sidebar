@@ -8,7 +8,6 @@ chrome.runtime.onStartup.addListener(() => {
     initializePersistentSidebar();
 });
 
-// Initialize persistent sidebar based on stored settings
 function initializePersistentSidebar() {
     chrome.storage.local.get(['persistentSidebar'], function (result) {
         persistentSidebar = result.persistentSidebar || false;
@@ -18,10 +17,9 @@ function initializePersistentSidebar() {
     });
 }
 
-// Toggle persistent sidebar on extension icon click
 chrome.action.onClicked.addListener((tab) => {
     persistentSidebar = !persistentSidebar;
-    chrome.storage.local.set({ persistentSidebar: persistentSidebar });
+    chrome.storage.local.set({ persistentSidebar: persistentSidebar, sidebarState: persistentSidebar ? 'open' : 'closed' });
 
     if (persistentSidebar) {
         injectSidebar(tab.id);
@@ -30,7 +28,6 @@ chrome.action.onClicked.addListener((tab) => {
     }
 });
 
-// Inject sidebar into all tabs if persistentSidebar is enabled
 function injectSidebarInAllTabs() {
     chrome.tabs.query({}, function (tabs) {
         tabs.forEach(tab => {
@@ -53,7 +50,6 @@ function injectSidebarInAllTabs() {
     });
 }
 
-// Remove sidebar from all tabs
 function removeSidebarFromAllTabs() {
     chrome.tabs.query({}, function (tabs) {
         tabs.forEach(tab => {
@@ -64,11 +60,10 @@ function removeSidebarFromAllTabs() {
     });
 }
 
-// Inject sidebar into a specific tab
 function injectSidebar(tabId) {
     chrome.scripting.executeScript({
         target: { tabId: tabId },
-        func: function() {
+        func: function () {
             if (!document.getElementById('persistent-sidebar')) {
                 var sidebar = document.createElement('div');
                 sidebar.id = 'persistent-sidebar';
@@ -82,7 +77,7 @@ function injectSidebar(tabId) {
                 sidebar.style.zIndex = '9999999'; // Max z-index value
                 sidebar.style.overflowY = 'scroll';
                 sidebar.style.transform = 'translateZ(0)'; // Create a new stacking context
-                
+
                 sidebar.innerHTML = '<iframe src="' + chrome.runtime.getURL('sidebar.html') + '" style="width: 100%; height: 100%; border: none;"></iframe>';
                 document.body.appendChild(sidebar);
                 console.log("Sidebar appended to the body.");
@@ -95,37 +90,29 @@ function injectSidebar(tabId) {
     });
 }
 
-
-// Remove sidebar from a specific tab
 function removeSidebar(tabId) {
     chrome.scripting.executeScript({
         target: { tabId: tabId },
-        func: removeSidebarFunction
+        func: function () {
+            const sidebar = document.getElementById('persistent-sidebar');
+            if (sidebar) {
+                sidebar.remove();
+                document.body.style.marginLeft = '0';
+            }
+        }
     });
 }
 
-// Function to remove sidebar from a tab
-function removeSidebarFunction() {
-    const sidebar = document.getElementById('persistent-sidebar');
-    if (sidebar) {
-        sidebar.remove();
-        document.body.style.marginLeft = '0';
-    }
-}
-
-// Check if URL is valid for sidebar injection
 function isValidUrl(url) {
     return url && !url.startsWith('chrome://') && !url.startsWith('about://') && !url.startsWith('chrome-extension://');
 }
 
-// Listen for messages from content_script.js
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
     if (message.action === 'collectPageData') {
         chrome.storage.local.set({ pageData: message.data });
     }
 });
 
-// Intercept response headers for the main document only
 chrome.webRequest.onCompleted.addListener(
     function (details) {
         if (details.type === 'main_frame') {
@@ -142,7 +129,6 @@ chrome.webRequest.onCompleted.addListener(
     { urls: ["<all_urls>"] },
     ["responseHeaders"]
 );
-
 
 chrome.webRequest.onCompleted.addListener(
     function (details) {

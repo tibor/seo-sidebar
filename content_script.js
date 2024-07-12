@@ -38,10 +38,11 @@ function getCharacterCount(text) {
 }
 
 // Check user settings on load
-chrome.storage.local.get(['persistentSidebar'], function (result) {
+chrome.storage.local.get(['persistentSidebar', 'sidebarState'], function (result) {
     const persistentSidebar = result.persistentSidebar || false;
+    const sidebarState = result.sidebarState || 'closed';
 
-    if (persistentSidebar) {
+    if (persistentSidebar && sidebarState === 'open') {
         createSidebar();
     } else {
         removeSidebar();
@@ -50,10 +51,11 @@ chrome.storage.local.get(['persistentSidebar'], function (result) {
 
 // Listen for changes in user settings
 chrome.storage.onChanged.addListener(function (changes, area) {
-    if (area === 'local' && 'persistentSidebar' in changes) {
-        const persistentSidebar = changes.persistentSidebar.newValue || false;
+    if (area === 'local' && ('persistentSidebar' in changes || 'sidebarState' in changes)) {
+        const persistentSidebar = changes.persistentSidebar ? changes.persistentSidebar.newValue : false;
+        const sidebarState = changes.sidebarState ? changes.sidebarState.newValue : 'closed';
 
-        if (persistentSidebar) {
+        if (persistentSidebar && sidebarState === 'open') {
             createSidebar();
         } else {
             removeSidebar();
@@ -81,8 +83,6 @@ function collectLinks() {
         externalLinks: [...new Set(externalLinks)] // Remove duplicates
     };
 }
-
-
 
 function collectPageData() {
     const canonicalElement = document.querySelector('link[rel="canonical"]');
