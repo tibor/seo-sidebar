@@ -50,4 +50,11 @@ You can reach me at aviationcoder@googlemail.com.
 - ✔️ Collection of internal and external links on the page.
 - ✔️ Export of data to JSON ~~and CSV~~.
 - ✔️ Display robots.txt content.
+- ✔️ Option to highlight nofollow links
+
+## Important fixes and changes
+- Sidebar doesn't interfere with page margin anymore.<br>
+  The sidebar will overlay the content and can be shown or hidden usinng the extension icon.
+- The script now shows the count of canonical URLs.
+- Cleaned up the tool buttons so they don't take up as much space.
 

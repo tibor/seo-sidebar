@@ -14,9 +14,6 @@ function createSidebar() {
 
         sidebar.innerHTML = '<iframe src="' + chrome.runtime.getURL('sidebar.html') + '" style="width: 100%; height: 100%; border: none;"></iframe>';
         document.body.appendChild(sidebar);
-
-        // Adjust body margin to accommodate the sidebar
-        document.body.style.marginLeft = '500px';
     }
 }
 
@@ -89,12 +86,13 @@ function collectPageData() {
     const canonicalUrl = canonicalElement ? canonicalElement.getAttribute('href') : '';
     const currentUrl = window.location.href;
 
-    // Create URL objects to easily strip off query parameters
     const currentUrlObj = new URL(currentUrl);
     const canonicalUrlObj = new URL(canonicalUrl);
 
     const currentUrlNoParams = currentUrlObj.origin + currentUrlObj.pathname;
-    const canonicalUrlNoParams = canonicalUrlObj.origin + canonicalUrlObj.pathname;
+    const canonicalUrlNoParams = canonicalUrlObj.origin + currentUrlObj.pathname;
+
+    const canonicalLinkCount = document.querySelectorAll('link[rel="canonical"]').length;
 
     const firstH1 = document.querySelector('h1');
     const firstH1Text = firstH1 ? firstH1.textContent : 'No H1 found';
@@ -120,17 +118,17 @@ function collectPageData() {
             'No canonical defined',
         schemaTypes: [], // Ensure schemaTypes is initialized as an array
         headings: collectHeadings(),
-        links: collectLinks()
+        links: collectLinks(), 
+        canonicalLinkCount: canonicalLinkCount,
+        metaRobotsCount : document.querySelectorAll('meta[name="robots"]').length
     };
 
-    // Measure page load time
     if (performance.timing.loadEventEnd) {
         pageData.pageLoadTime = performance.timing.loadEventEnd - performance.timing.navigationStart;
     } else {
         pageData.pageLoadTime = performance.now();
     }
 
-    // Extract schema.org types
     const scripts = document.querySelectorAll('script[type="application/ld+json"]');
     scripts.forEach(script => {
         try {
@@ -144,18 +142,38 @@ function collectPageData() {
         }
     });
 
-    // Get the HTTP status code from storage
-    chrome.storage.local.get('httpStatusCode', function (result) {
-        pageData.httpStatusCode = result.httpStatusCode || 'N/A';
+    // Fetch robots.txt and store page data again with robots.txt content
+    chrome.runtime.sendMessage({
+        action: 'fetchRobotsTxt',
+        url: window.location.origin
+    }, function(response) {
+        if (response.success) {
+            pageData.robotsTxt = response.content;
+            const sitemaps = [];
+            const sitemapMatches = response.content.match(/Sitemap:\s*(https?:\/\/\S+)/gi);
+            if (sitemapMatches) {
+                sitemapMatches.forEach(sitemap => {
+                    sitemaps.push(sitemap.replace('Sitemap: ', ''));
+                });
+            }
+            pageData.sitemaps = sitemaps;
+            chrome.runtime.sendMessage({
+                action: 'storePageData',
+                data: pageData
+            });
+        } else {
+            console.error('Failed to fetch robots.txt:', response.error);
+        }
+    });
 
-        // Send the collected page data to the background script
-        chrome.runtime.sendMessage({ action: 'collectPageData', data: pageData });
+    chrome.runtime.sendMessage({
+        action: 'storePageData',
+        data: pageData
     });
 
     return pageData;
 }
 
-// Function to collect headings and build a nested list structure
 function collectHeadings() {
     const headings = Array.from(document.querySelectorAll('h1, h2, h3, h4, h5, h6'));
     return buildNestedHeadings(headings);
@@ -190,7 +208,6 @@ function buildNestedHeadings(headings) {
     return nestedHeadings;
 }
 
-// Function to extract schema.org types from JSON-LD
 function extractSchemaTypes(json) {
     if (Array.isArray(json)) {
         return json.map(item => extractSchemaTypes(item)).filter(Boolean);
@@ -210,10 +227,40 @@ function extractSchemaTypes(json) {
     return null;
 }
 
-// Ensure script runs after document is fully loaded
+function handleUrlChange() {
+    setTimeout(() => {
+        collectPageData();
+    }, 1000); // Delay to ensure the page fully loads
+}
+
 window.onload = function () {
     collectPageData();
 };
 
-// Send the collected page data to the background script
-chrome.runtime.sendMessage({ action: 'collectPageData', data: collectPageData() });
+chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+    if (request.action === 'highlightNofollowLinks') {
+        highlightNofollowLinks(request.shouldHighlight);
+    } else if (request.action === 'urlChanged') {
+        handleUrlChange();
+    }
+});
+
+// Function to highlight or remove highlight from nofollow links
+function highlightNofollowLinks(shouldHighlight) {
+    const allLinks = document.querySelectorAll('a');
+    allLinks.forEach(link => {
+        const rel = link.getAttribute('rel');
+        if (rel && rel.split(' ').includes('nofollow')) {
+            if (shouldHighlight) {
+                link.style.textDecoration = 'underline';
+                link.style.textDecorationColor = 'red';
+                link.style.textDecorationThickness = '3px';
+                link.style.backgroundColor = 'rgba(255, 0, 0, 0.4)'; 
+            } else {
+                link.style.textDecoration = '';
+                link.style.textDecorationColor = '';
+                link.style.backgroundColor = '';
+            }
+        }
+    });
+}

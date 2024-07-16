@@ -36,11 +36,6 @@ document.addEventListener('DOMContentLoaded', function () {
                                 sidebar.style.width = width + 'px';
                                 sidebar.style.backgroundColor = color;
                             }
-
-                            // Apply margin-left only if we're in the main document
-                            if (window.location.href !== chrome.runtime.getURL('sidebar.html')) {
-                                document.body.style.marginLeft = width + 'px';
-                            }
                         },
                         args: [result.sidebarWidth || 500, result.sidebarBgColor || '#f1f1f1']
                     });

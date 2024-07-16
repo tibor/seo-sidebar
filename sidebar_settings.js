@@ -8,10 +8,5 @@ document.addEventListener('DOMContentLoaded', function () {
                 sidebar.style.backgroundColor = result.sidebarBgColor || '#f1f1f1';
             }
         });
-    } else {
-        // This is the main document, apply the width and margin-left
-        chrome.storage.local.get(['sidebarWidth'], function (result) {
-            document.body.style.marginLeft = (result.sidebarWidth || 500) + 'px';
-        });
-    }
+    } 
 });

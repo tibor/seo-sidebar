@@ -5,54 +5,55 @@
     <title>SEO Sidebar</title>
     <link rel="stylesheet" type="text/css" href="sidebar.css">
     <meta http-equiv="Content-Security-Policy" content="script-src 'self'; object-src 'self'">
-
 </head>
 
 <body>
-    <div id="sidebar-content">
+    <div id="sidebar-header">
         <h1>SEO Sidebar</h1>
+    </div>
+
+    <div id="sidebar-content">
         <p>
             <a href="https://haensel.pro" target="_blank" title="The creator of this shiny object">&raquo;
-                haensel.pro</a> &middot; <a id="openSettingsLink" href="#"> &raquo; Extension Settings</a> <br>
+                haensel.pro</a> &middot;
+            <a id="openSettingsLink" href="#"> &raquo; Extension Settings</a> <br>
             <small>You can toggle this sidebar by clicking the extension icon in your browser.</small>
         </p>
 
         <div class="section">
             <h2>Tools</h2>
-            <ul>
-                <li>
-                    <a id="openValidatorLink" href="#">Schema Markup Validator</a>
-                </li>
-                <li>
-                    <a id="validateInGoogleRichResult" href="#">Rich Result Testing Tool</a>
-                </li>
+            <ul class="tools-list-button">
+                <li><a id="openValidatorLink" href="#">Schema Markup Validator</a></li>
+                <li><a id="validateInGoogleRichResult" href="#">Rich Result Testing Tool</a></li>
             </ul>
         </div>
 
         <div class="section">
             <h2>Page Data</h2>
-        
             <form id="page-data-form">
-
-                <label for="http_status_code">HTTP Status Code</label>
-                <input type="text" id="http_status_code"><br><br>
+                <div><b>HTTP Status Code:</b> <span id="http_status_code"></span></div>
+                <br>
 
                 <label for="page_title">Page Title:</label>
-                <textarea id="page_title" name="page_title"></textarea>
+                <textarea id="page_title" name="page_title" class="large"></textarea>
                 <div id="page_title_counts"></div>
                 <br><br>
 
                 <label for="meta_description">Meta Description:</label>
-                <textarea id="meta_description" name="meta_description"></textarea>
+                <textarea id="meta_description" name="meta_description" class="large"></textarea>
                 <div id="meta_description_counts"></div>
                 <br><br>
 
                 <label for="meta_robots">Meta Robots:</label>
-                <textarea id="meta_robots" name="meta_robots"></textarea><br><br>
+                <textarea id="meta_robots" name="meta_robots" class="large"></textarea>
+                <div id="meta_robots_count"></div>
+
+                <br><br>
 
                 <label for="canonical_url">Canonical URL:</label>
                 <input type="text" id="canonical_url" name="canonical_url">
                 <div id="canonical_is_same_as_url"></div>
+                <div id="canonical_link_count"></div>
                 <div><small>Note: GET parameters are stripped from the page URL</small></div>
                 <br><br>
 
@@ -77,7 +78,7 @@
         <div class="section">
             <h2>Headings</h2>
             <ul id="headings-list">
-                <!-- Schema types will be inserted here -->
+                <!-- Headings will be inserted here -->
             </ul>
         </div>
 
@@ -93,17 +94,20 @@
             <textarea id="sitemaps" name="sitemaps"></textarea>
         </div>
 
-
-
         <div class="section">
             <h2>Response Headers</h2>
             <label for="response_headers">Response Headers:</label>
             <textarea id="response_headers" name="response_headers" class="large"></textarea><br><br>
         </div>
 
-
         <div class="section">
             <h2>Links on page</h2>
+            <div id="nofollow-checkbox-container">
+                <input type="checkbox" id="nofollow-checkbox">
+                <label for="nofollow-checkbox">Highlight nofollow links</label>
+            </div>
+<hr>
+            
             <label for="internal_links">Internal Links:</label>
             <textarea id="internal_links" name="internal_links" class="large"></textarea><br><br>
 
@@ -115,13 +119,10 @@
             <h2>Download Page Data</h2>
             <button id="download-json">Download data as JSON</button>
         </div>
-
-
     </div>
 
     <script src="scripts.js" defer></script>
     <script src="sidebar_settings.js" defer></script>
-
 </body>
 
 </html>

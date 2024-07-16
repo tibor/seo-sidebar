@@ -8,7 +8,8 @@
         "activeTab",
         "storage",
         "scripting",
-        "webRequest"
+        "webRequest",
+        "declarativeContent"
     ],
     "host_permissions": [
         "*://*/*"
@@ -52,6 +53,7 @@
         "48": "icons/sidebar-icon-48.png",
         "128": "icons/sidebar-icon-128.png"
     },
-    "options_page": "settings.html"
+    "options_page": "settings.html",
+    "update_url": "https://seosidebar.haensel.pro/update.xml"
 
 }
