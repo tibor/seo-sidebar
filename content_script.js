@@ -264,3 +264,4 @@ function highlightNofollowLinks(shouldHighlight) {
         }
     });
 }
+

@@ -86,6 +86,61 @@
             <h2>robots.txt</h2>
             <label for="robots_txt">robots.txt:</label>
             <textarea id="robots_txt" name="robots_txt"></textarea>
+            <hr>
+            <h3>Check URL against robots.txt</h2>
+                <p>
+                    Can this URL be crawled by one of the following UserAgents? Try it out.
+                </p>
+            <label for="userAgent">User Agent</label>
+            <select name="userAgent" id="userAgent">
+                <optgroup label="Search Engine Bots">
+                    <option value="AdsBot-Google">AdsBot-Google</option>
+                    <option value="Amazonbot">Amazonbot</option>
+                    <option value="Applebot">Applebot</option>
+                    <option value="Baiduspider">Baiduspider</option>
+                    <option value="bingbot">bingbot</option>
+                    <option value="Bytespider">Bytespider</option>
+                    <option value="CCBot">CCBot</option>
+                    <option value="DuckDuckBot">DuckDuckBot</option>
+                    <option value="Exabot">Exabot</option>
+                    <option value="FacebookBot">FacebookBot</option>
+                    <option value="facebot">facebot</option>
+                    <option value="FriendlyCrawler">FriendlyCrawler</option>
+                    <option value="Google-Extended">Google-Extended</option>
+                    <option value="GoogleOther">GoogleOther</option>
+                    <option value="Googlebot">Googlebot</option>
+                    <option value="Googlebot-Image">Googlebot-Image</option>
+                    <option value="Googlebot-News">Googlebot-News</option>
+                    <option value="Googlebot-Video">Googlebot-Video</option>
+                    <option value="ImagesiftBot">ImagesiftBot</option>
+                    <option value="MJ12bot">MJ12bot</option>
+                    <option value="PetalBot">PetalBot</option>
+                    <option value="Slurp">Slurp</option>
+                    <option value="Sogou web spider">Sogou web spider</option>
+                    <option value="Twitterbot">Twitterbot</option>
+                    <option value="YandexBot">YandexBot</option>
+                    <option value="YouBot">YouBot</option>
+                    <option value="img2dataset">img2dataset</option>
+                    <option value="msnbot">msnbot</option>
+                    <option value="omgili">omgili</option>
+                    <option value="omgilibot">omgilibot</option>
+                    <option value="seznambot">seznambot</option>
+                </optgroup>
+                <optgroup label="AI Bots">
+                    <option value="ChatGPT-User">ChatGPT-User</option>
+                    <option value="Claude-Web">Claude-Web</option>
+                    <option value="ClaudeBot">ClaudeBot</option>
+                    <option value="Diffbot">Diffbot</option>
+                    <option value="GPTBot">GPTBot</option>
+                    <option value="PerplexityBot">PerplexityBot</option>
+                    <option value="anthropic-ai">anthropic-ai</option>
+                    <option value="cohere-ai">cohere-ai</option>
+                </optgroup>
+            </select>
+            
+            <hr>
+            <button id="check-url">Check URL</button>
+            <p id="result"></p>
         </div>
 
         <div class="section">

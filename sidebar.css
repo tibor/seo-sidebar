@@ -233,3 +233,33 @@ div.section {
 #nofollow-checkbox-container input[type="checkbox"] {
     margin-right: 10px;
 }
+/* Styles for select box */
+select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    box-sizing: border-box;
+    background-color: #fff;
+    font-size: 14px;
+    margin-bottom: 10px;
+    -webkit-appearance: none; /* For Webkit browsers */
+    -moz-appearance: none; /* For Firefox */
+    appearance: none; /* For other browsers */
+    background-image: url('data:image/svg+xml;charset=US-ASCII,<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="none" stroke="%23333"><path stroke-width="2" d="M2 6l6 6 6-6"/></svg>'); /* Custom arrow */
+    background-repeat: no-repeat;
+    background-position: right 10px top 50%;
+    background-size: 12px 12px;
+}
+
+/* Additional styles for select box in focus state */
+select:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 3px rgba(0, 123, 255, 0.5);
+    outline: none;
+}
+
+/* Styles for select box options */
+select option {
+    padding: 10px;
+}

@@ -70,10 +70,10 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     function updateSidebarContent() {
-        chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+        chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
             const tabId = tabs[0].id;
             console.log('Updating sidebar content for tab', tabId);
-            chrome.storage.local.get(tabId.toString(), function(result) {
+            chrome.storage.local.get(tabId.toString(), function (result) {
                 const pageData = result[tabId.toString()];
                 if (pageData) {
                     console.log('Page data found for tab', tabId, pageData);
@@ -117,11 +117,11 @@ document.addEventListener('DOMContentLoaded', function () {
 
     chrome.storage.onChanged.addListener(function (changes, area) {
         if (area === 'local') {
-            chrome.tabs.query({ active: true, currentWindow: true }, function(tabs) {
+            chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
                 const tabId = tabs[0].id;
                 if (changes[tabId.toString()]) {
                     console.log('Changes detected for tab', tabId, changes[tabId.toString()]);
-                    chrome.storage.local.get(tabId.toString(), function(result) {
+                    chrome.storage.local.get(tabId.toString(), function (result) {
                         const pageData = result[tabId.toString()];
                         if (pageData) {
                             console.log('Updated page data for tab', tabId, pageData);
@@ -133,7 +133,7 @@ document.addEventListener('DOMContentLoaded', function () {
         }
     });
 
-    chrome.tabs.onActivated.addListener(function(activeInfo) {
+    chrome.tabs.onActivated.addListener(function (activeInfo) {
         console.log('Tab activated', activeInfo);
         updateSidebarContent();
     });
@@ -164,7 +164,7 @@ document.addEventListener('DOMContentLoaded', function () {
         chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
             const tabId = tabs[0].id;
             console.log('Downloading JSON for tab', tabId);
-            chrome.storage.local.get(tabId.toString(), function(result) {
+            chrome.storage.local.get(tabId.toString(), function (result) {
                 const pageData = result[tabId.toString()];
                 if (pageData) {
                     downloadJSON(pageData);
@@ -174,4 +174,104 @@ document.addEventListener('DOMContentLoaded', function () {
             });
         });
     });
+
+
+
+
+    document.getElementById('check-url').addEventListener('click', function() {
+        const robotsTxt = document.getElementById('robots_txt').value;
+        const userAgent = document.getElementById('userAgent').value;
+    
+        chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
+            const tabId = tabs[0].id;
+            chrome.scripting.executeScript({
+                target: { tabId: tabId },
+                func: (robotsTxt, userAgent) => {
+                    const url = new URL(window.location.href); // Get the current URL
+    
+                    function parseRobotsTxt(robotsTxt) {
+                        const lines = robotsTxt.split('\n');
+                        const rules = {};
+                        let currentUserAgent = '*';
+    
+                        for (let line of lines) {
+                            const commentIndex = line.indexOf('#');
+                            if (commentIndex !== -1) {
+                                line = line.substring(0, commentIndex);
+                            }
+    
+                            const [key, value] = line.split(':').map(s => s.trim());
+    
+                            if (key.toLowerCase() === 'user-agent') {
+                                currentUserAgent = value;
+                                if (!rules[currentUserAgent]) {
+                                    rules[currentUserAgent] = [];
+                                }
+                            } else if (key.toLowerCase() === 'allow' || key.toLowerCase() === 'disallow') {
+                                rules[currentUserAgent].push({
+                                    type: key.toLowerCase(),
+                                    path: value
+                                });
+                            }
+                        }
+    
+                        return rules;
+                    }
+    
+                    function checkRobotsTxt(robotsTxt, userAgent, path) {
+                        const rules = parseRobotsTxt(robotsTxt);
+                        console.log('Parsed rules:', rules); // Debugging log
+                        const userAgentRules = rules[userAgent] || rules['*'] || [];
+                        const disallowRules = userAgentRules.filter(rule => rule.type === 'disallow');
+                        const allowRules = userAgentRules.filter(rule => rule.type === 'allow');
+    
+                        console.log(`Checking path "${path}" for userAgent "${userAgent}"`); // Debugging log
+    
+                        for (const rule of disallowRules) {
+                            console.log(`Disallow rule: "${rule.path}"`); // Debugging log
+                            if (rule.path && path.startsWith(rule.path)) {
+                                console.log('Matched disallow rule'); // Debugging log
+                                return { canCrawl: false, rule: rule };
+                            }
+                        }
+    
+                        for (const rule of allowRules) {
+                            console.log(`Allow rule: "${rule.path}"`); // Debugging log
+                            if (path.startsWith(rule.path)) {
+                                console.log('Matched allow rule'); // Debugging log
+                                return { canCrawl: true, rule: rule };
+                            }
+                        }
+    
+                        return { canCrawl: true, rule: null }; // Default to allow if no disallow rule matches
+                    }
+    
+                    const result = checkRobotsTxt(robotsTxt, userAgent, url.pathname);
+    
+                    chrome.runtime.sendMessage({
+                        action: 'updateResult',
+                        canCrawl: result.canCrawl,
+                        userAgent: userAgent,
+                        rule: result.rule
+                    });
+                },
+                args: [robotsTxt, userAgent]
+            });
+        });
+    });
+
+
+    // Listen for messages from the content script
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+    if (message.action === 'updateResult') {
+        const resultElement = document.getElementById('result');
+        if (message.canCrawl) {
+            resultElement.innerText = "URL can be crawled by " + message.userAgent;
+        } else {
+            resultElement.innerText = "URL cannot be crawled by " + message.userAgent + "\nReason: Disallow rule matching path \"" + (message.rule ? message.rule.path : "") + "\"";
+        }
+    }
+});
+
+
 });

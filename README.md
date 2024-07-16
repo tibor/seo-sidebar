@@ -60,6 +60,7 @@ You can reach me at aviationcoder@googlemail.com.
 - ✔️ Collection of internal and external links on the page.
 - ✔️ Export of data to JSON ~~and CSV~~.
 - ✔️ Display robots.txt content.
+- ✔️ Function to check current URL against robots.txt using a selection of common UserAgents.
 - ✔️ Option to highlight nofollow links
 
 ## Important fixes and changes
