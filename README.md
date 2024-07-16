@@ -16,6 +16,8 @@ The SEO Sidebar Chrome Extension adds a sidebar to the browser that remains open
 ## Installation
 
 ### Get it from the Chrome webstore: 
+See screenshots and download the extension from the Chrome Web Store:
+
 https://chromewebstore.google.com/detail/persistent-seo-sidebar/hodblncbcllndkgacdoibhopgocikhbl?hl=de
 
 
@@ -31,22 +33,6 @@ https://chromewebstore.google.com/detail/persistent-seo-sidebar/hodblncbcllndkga
 1. Once the extension is loaded, click the extension icon to toggle the sidebar.
 2. The sidebar will appear on the left side of the browser window.
 3. Use the provided tools and links within the sidebar.
-
-## Screenshots
-Here are some screenshots so you cen see what it looks like. They might be a bit out of date - I tend to forget stuff like this.
-
-![First view of the thing](screenshots/1.4_1.png)
-![First view of the thing](screenshots/1.4_2.png)
-![First view of the thing](screenshots/1.4_3.png)
-![First view of the thing](screenshots/1.4_4.png)
-
-
-### Quick sample video
-
-<video width="600" controls>
-  <source src="screenshots/seosidebar_1.4_video.mp4" type="video/mp4">
-  Your browser does not support the video tag.
-</video>
 
 
 By the way: I hope Stephan Czysch is okay with me using his website for my screenshots. I love his list of [SEO Browser Plugins and Bookmarklets](https://www.stephan-czysch.de/online-marketing-tipps/perfekter-seo-browser-plugins-bookmarklets). Go and check them out ❤️.
