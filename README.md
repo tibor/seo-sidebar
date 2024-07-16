@@ -15,6 +15,12 @@ The SEO Sidebar Chrome Extension adds a sidebar to the browser that remains open
 
 ## Installation
 
+### Get it from the Chrome webstore: 
+https://chromewebstore.google.com/detail/persistent-seo-sidebar/hodblncbcllndkgacdoibhopgocikhbl?hl=de
+
+
+#### Or use the ZIP (not recommended)
+
 1. Clone the repository or download the zip file.
 2. Open Chrome and navigate to `chrome://extensions/`.
 3. Enable "Developer mode" using the toggle in the top right corner.
