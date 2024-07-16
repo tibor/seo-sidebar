@@ -1,7 +1,7 @@
 {
     "manifest_version": 3,
     "name": "Persistent SEO Sidebar",
-    "version": "1.5",
+    "version": "1.6",
     "description": "A Chrome extension with a persistent sidebar to display SEO information.",
     "permissions": [
         "tabs",
@@ -53,6 +53,7 @@
         "48": "icons/sidebar-icon-48.png",
         "128": "icons/sidebar-icon-128.png"
     },
-    "options_page": "settings.html"
+    "options_page": "settings.html",
+    "update_url": "https://seosidebar.haensel.pro/update.xml"
 
 }

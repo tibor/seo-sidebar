@@ -69,4 +69,4 @@ You can reach me at aviationcoder@googlemail.com.
 - The script now shows the count of canonical URLs and meta robots tags.
 - Cleaned up the tool buttons so they don't take up as much space.
 - Sometimes I've had the issue that the HTTP response code and response headers were not loaded. This _should_ be fixed - but if it happens to you, simply reload the page.
-
+- Fixed robots.txt checker - there was a bug so it wouldn't work with consecutive useragent directives.

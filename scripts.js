@@ -178,55 +178,61 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
 
-    document.getElementById('check-url').addEventListener('click', function() {
+    document.getElementById('check-url').addEventListener('click', function () {
         const robotsTxt = document.getElementById('robots_txt').value;
         const userAgent = document.getElementById('userAgent').value;
-    
+
         chrome.tabs.query({ active: true, currentWindow: true }, function (tabs) {
             const tabId = tabs[0].id;
             chrome.scripting.executeScript({
                 target: { tabId: tabId },
                 func: (robotsTxt, userAgent) => {
                     const url = new URL(window.location.href); // Get the current URL
-    
+
                     function parseRobotsTxt(robotsTxt) {
                         const lines = robotsTxt.split('\n');
                         const rules = {};
-                        let currentUserAgent = '*';
-    
+                        let currentUserAgents = [];
+
                         for (let line of lines) {
                             const commentIndex = line.indexOf('#');
                             if (commentIndex !== -1) {
                                 line = line.substring(0, commentIndex);
                             }
-    
+
                             const [key, value] = line.split(':').map(s => s.trim());
-    
+
                             if (key.toLowerCase() === 'user-agent') {
-                                currentUserAgent = value;
-                                if (!rules[currentUserAgent]) {
-                                    rules[currentUserAgent] = [];
-                                }
+                                currentUserAgents.push(value);
                             } else if (key.toLowerCase() === 'allow' || key.toLowerCase() === 'disallow') {
-                                rules[currentUserAgent].push({
-                                    type: key.toLowerCase(),
-                                    path: value
+                                currentUserAgents.forEach(agent => {
+                                    if (!rules[agent]) {
+                                        rules[agent] = [];
+                                    }
+                                    rules[agent].push({
+                                        type: key.toLowerCase(),
+                                        path: value
+                                    });
                                 });
                             }
                         }
-    
+
                         return rules;
                     }
-    
+
                     function checkRobotsTxt(robotsTxt, userAgent, path) {
                         const rules = parseRobotsTxt(robotsTxt);
                         console.log('Parsed rules:', rules); // Debugging log
-                        const userAgentRules = rules[userAgent] || rules['*'] || [];
+
+                        const userAgentRules = [
+                            ...rules[userAgent] || [],
+                            ...rules['*'] || []
+                        ];
                         const disallowRules = userAgentRules.filter(rule => rule.type === 'disallow');
                         const allowRules = userAgentRules.filter(rule => rule.type === 'allow');
-    
+
                         console.log(`Checking path "${path}" for userAgent "${userAgent}"`); // Debugging log
-    
+
                         for (const rule of disallowRules) {
                             console.log(`Disallow rule: "${rule.path}"`); // Debugging log
                             if (rule.path && path.startsWith(rule.path)) {
@@ -234,7 +240,7 @@ document.addEventListener('DOMContentLoaded', function () {
                                 return { canCrawl: false, rule: rule };
                             }
                         }
-    
+
                         for (const rule of allowRules) {
                             console.log(`Allow rule: "${rule.path}"`); // Debugging log
                             if (path.startsWith(rule.path)) {
@@ -242,12 +248,12 @@ document.addEventListener('DOMContentLoaded', function () {
                                 return { canCrawl: true, rule: rule };
                             }
                         }
-    
+
                         return { canCrawl: true, rule: null }; // Default to allow if no disallow rule matches
                     }
-    
+
                     const result = checkRobotsTxt(robotsTxt, userAgent, url.pathname);
-    
+
                     chrome.runtime.sendMessage({
                         action: 'updateResult',
                         canCrawl: result.canCrawl,
@@ -262,16 +268,27 @@ document.addEventListener('DOMContentLoaded', function () {
 
 
     // Listen for messages from the content script
-chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
-    if (message.action === 'updateResult') {
-        const resultElement = document.getElementById('result');
-        if (message.canCrawl) {
-            resultElement.innerText = "URL can be crawled by " + message.userAgent;
-        } else {
-            resultElement.innerText = "URL cannot be crawled by " + message.userAgent + "\nReason: Disallow rule matching path \"" + (message.rule ? message.rule.path : "") + "\"";
+    chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+        if (message.action === 'updateResult') {
+            const resultElement = document.getElementById('result');
+            if (message.canCrawl) {
+                resultElement.innerText = "URL can be crawled by " + message.userAgent;
+            } else {
+                resultElement.innerText = "URL cannot be crawled by " + message.userAgent + "\nReason: Disallow rule matching path \"" + (message.rule ? message.rule.path : "") + "\"";
+            }
         }
-    }
+    });
+
+
 });
 
 
+chrome.runtime.onInstalled.addListener(function(details) {
+    if (details.reason === chrome.runtime.OnInstalledReason.UPDATE) {
+        // The URL you want to open after the update
+        const url = "https://seosidebar.haensel.pro/updated.php";
+
+        // Open a new tab with the specified URL
+        chrome.tabs.create({ url: url });
+    }
 });
