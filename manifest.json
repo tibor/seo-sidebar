@@ -9,11 +9,15 @@
         "storage",
         "scripting",
         "webRequest",
-        "declarativeContent"
+        "declarativeContent",
+        "sidePanel"
     ],
     "host_permissions": [
         "*://*/*"
     ],
+    "side_panel": {
+        "default_path": "sidebar.html"
+    },
     "web_accessible_resources": [
         {
             "resources": [
@@ -33,7 +37,8 @@
             "16": "icons/sidebar-icon-16.png",
             "48": "icons/sidebar-icon-48.png",
             "128": "icons/sidebar-icon-128.png"
-        }
+        },
+        "default_title": "Open the panel"
     },
     "content_scripts": [
         {
