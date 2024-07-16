@@ -49,7 +49,12 @@ function injectSidebarInAllTabs() {
         }
         if (changeInfo.url && isValidUrl(changeInfo.url)) {
             clearPageData(tabId);
-            chrome.tabs.sendMessage(tabId, { action: 'urlChanged' });
+            chrome.scripting.executeScript({
+                target: { tabId: tabId },
+                func: function () {
+                    chrome.runtime.sendMessage({ action: 'urlChanged' });
+                }
+            });
         }
     });
 }
@@ -67,23 +72,28 @@ function removeSidebarFromAllTabs() {
 function injectSidebar(tabId) {
     chrome.scripting.executeScript({
         target: { tabId: tabId },
-        func: function () {
-            if (!document.getElementById('persistent-sidebar')) {
-                var sidebar = document.createElement('div');
-                sidebar.id = 'persistent-sidebar';
-                sidebar.style.position = 'fixed';
-                sidebar.style.top = '0';
-                sidebar.style.left = '0';
-                sidebar.style.width = '500px';
-                sidebar.style.height = '100vh';
-                sidebar.style.backgroundColor = '#f1f1f1';
-                sidebar.style.borderRight = '1px solid #ccc';
-                sidebar.style.zIndex = '9999999'; // Max z-index value
-                sidebar.style.transform = 'translateZ(0)'; // Create a new stacking context
-                sidebar.innerHTML = '<iframe src="' + chrome.runtime.getURL('sidebar.html') + '" style="width: 100%; height: 100vh; border: none;"></iframe>';
-                document.body.appendChild(sidebar);
+        files: ['content_script.js']
+    }, function() {
+        chrome.scripting.executeScript({
+            target: { tabId: tabId },
+            func: function () {
+                if (!document.getElementById('persistent-sidebar')) {
+                    var sidebar = document.createElement('div');
+                    sidebar.id = 'persistent-sidebar';
+                    sidebar.style.position = 'fixed';
+                    sidebar.style.top = '0';
+                    sidebar.style.left = '0';
+                    sidebar.style.width = '500px';
+                    sidebar.style.height = '100vh';
+                    sidebar.style.backgroundColor = '#f1f1f1';
+                    sidebar.style.borderRight = '1px solid #ccc';
+                    sidebar.style.zIndex = '9999999'; // Max z-index value
+                    sidebar.style.transform = 'translateZ(0)'; // Create a new stacking context
+                    sidebar.innerHTML = '<iframe src="' + chrome.runtime.getURL('sidebar.html') + '" style="width: 100%; height: 100vh; border: none;"></iframe>';
+                    document.body.appendChild(sidebar);
+                }
             }
-        }
+        });
     });
 }
 
@@ -119,16 +129,14 @@ chrome.webRequest.onCompleted.addListener(
             chrome.storage.local.get([tabId], function(result) {
                 console.log(`Retrieved data from storage for tab ${tabId}:`, result);
                 const pageData = result[tabId] || {};
-                if (!pageData.dataCollected) {
-                    pageData.responseHeaders = details.responseHeaders.map(header => `${header.name}: ${header.value}`).join('\n');
-                    pageData.httpStatusCode = details.statusCode; // Capture HTTP status code here
-                    pageData.dataCollected = true;
-                    console.log(`Captured response headers: ${pageData.responseHeaders}`);
-                    console.log(`Captured HTTP status code: ${pageData.httpStatusCode}`);
-                    chrome.storage.local.set({ [tabId]: pageData }, function() {
-                        console.log(`Stored response headers and status for tab ${tabId}`);
-                    });
-                }
+                pageData.responseHeaders = details.responseHeaders.map(header => `${header.name}: ${header.value}`).join('\n');
+                pageData.httpStatusCode = details.statusCode; // Capture HTTP status code here
+                pageData.dataCollected = true;
+                console.log(`Captured response headers: ${pageData.responseHeaders}`);
+                console.log(`Captured HTTP status code: ${pageData.httpStatusCode}`);
+                chrome.storage.local.set({ [tabId]: pageData }, function() {
+                    console.log(`Stored response headers and status for tab ${tabId}`);
+                });
             });
         }
     },
